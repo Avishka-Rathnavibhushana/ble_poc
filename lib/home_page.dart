@@ -14,6 +14,7 @@ class FlutterBlueApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       color: Colors.lightBlue,
+      debugShowCheckedModeBanner: false,
       home: StreamBuilder<BluetoothState>(
           stream: FlutterBlue.instance.state,
           initialData: BluetoothState.unknown,
@@ -183,38 +184,56 @@ class DeviceScreen extends StatelessWidget {
   }
 
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
-    return services
-        .map(
-          (s) => ServiceTile(
+    // BluetoothService service = services
+    //     .where((element) =>
+    //         element.uuid.toString().toUpperCase().substring(4, 8).toString() ==
+    //         '0004')
+    //     .first;
+    // BluetoothCharacteristic charachteristic = service.characteristics
+    //     .where((element) =>
+    //         element.uuid.toString().toUpperCase().substring(4, 8).toString() ==
+    //         '0001')
+    //     .first;
+    return services.map(
+      (s) {
+        if (s.uuid.toString().toUpperCase().substring(4, 8).toString() ==
+            '0004') {
+          return ServiceTile(
             service: s,
-            characteristicTiles: s.characteristics
-                .map(
-                  (c) => CharacteristicTile(
-                    characteristic: c,
-                    onReadPressed: () => c.read(),
-                    onWritePressed: () async {
-                      await c.write(_getRandomBytes(), withoutResponse: true);
-                      await c.read();
-                    },
-                    onNotificationPressed: () async {
-                      await c.setNotifyValue(!c.isNotifying);
-                      await c.read();
-                    },
-                    descriptorTiles: c.descriptors
-                        .map(
-                          (d) => DescriptorTile(
-                            descriptor: d,
-                            onReadPressed: () => d.read(),
-                            onWritePressed: () => d.write(_getRandomBytes()),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                )
-                .toList(),
-          ),
-        )
-        .toList();
+            characteristicTiles: s.characteristics.map((c) {
+              if (c.uuid.toString().toUpperCase().substring(4, 8).toString() ==
+                  '0001') {
+                return CharacteristicTile(
+                  characteristic: c,
+                  onReadPressed: () => c.read(),
+                  onWritePressed: () async {
+                    await c.write(_getRandomBytes(), withoutResponse: true);
+                    await c.read();
+                  },
+                  onNotificationPressed: () async {
+                    await c.setNotifyValue(!c.isNotifying);
+                    await c.read();
+                  },
+                  descriptorTiles: c.descriptors
+                      .map(
+                        (d) => DescriptorTile(
+                          descriptor: d,
+                          onReadPressed: () => d.read(),
+                          onWritePressed: () => d.write(_getRandomBytes()),
+                        ),
+                      )
+                      .toList(),
+                );
+              } else {
+                return Container();
+              }
+            }).toList(),
+          );
+        } else {
+          return Container();
+        }
+      },
+    ).toList();
   }
 
   @override
@@ -294,22 +313,23 @@ class DeviceScreen extends StatelessWidget {
                 ),
               ),
             ),
-            StreamBuilder<int>(
-              stream: device.mtu,
-              initialData: 0,
-              builder: (c, snapshot) => ListTile(
-                title: Text('MTU Size'),
-                subtitle: Text('${snapshot.data} bytes'),
-                trailing: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => device.requestMtu(223),
-                ),
-              ),
-            ),
+            // StreamBuilder<int>(
+            //   stream: device.mtu,
+            //   initialData: 0,
+            //   builder: (c, snapshot) => ListTile(
+            //     title: Text('MTU Size'),
+            //     subtitle: Text('${snapshot.data} bytes'),
+            //     trailing: IconButton(
+            //       icon: Icon(Icons.edit),
+            //       onPressed: () => device.requestMtu(223),
+            //     ),
+            //   ),
+            // ),
             StreamBuilder<List<BluetoothService>>(
               stream: device.services,
               initialData: [],
               builder: (c, snapshot) {
+                print(snapshot.data!);
                 return Column(
                   children: _buildServiceTiles(snapshot.data!),
                 );

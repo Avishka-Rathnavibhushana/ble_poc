@@ -2,6 +2,8 @@
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: prefer_is_empty, prefer_interpolation_to_compose_strings, non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
@@ -119,7 +121,7 @@ class ScanResultTile extends StatelessWidget {
 
 class ServiceTile extends StatelessWidget {
   final BluetoothService service;
-  final List<CharacteristicTile> characteristicTiles;
+  final List<Widget> characteristicTiles;
 
   const ServiceTile(
       {Key? key, required this.service, required this.characteristicTiles})
@@ -133,10 +135,16 @@ class ServiceTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Service'),
             Text(
-              '0x${service.uuid.toString().toUpperCase().substring(4, 8)}',
-            )
+              'Temperature',
+              style: TextStyle(
+                fontSize: 35,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+            // Text(
+            //   '0x${service.uuid.toString().toUpperCase().substring(4, 8)}',
+            // )
           ],
         ),
         children: characteristicTiles,
@@ -174,35 +182,63 @@ class CharacteristicTile extends StatelessWidget {
       initialData: characteristic.lastValue,
       builder: (c, snapshot) {
         final value = snapshot.data;
-        return ExpansionTile(
-          title: ListTile(
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('Characteristic'),
-                Text(
-                  '0x${characteristic.uuid.toString().toUpperCase().substring(4, 8)}',
-                )
-              ],
-            ),
-            subtitle: Text(value.toString()),
-            contentPadding: EdgeInsets.all(0.0),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.file_download,
-                  color: Theme.of(context).iconTheme.color?.withOpacity(0.5),
-                ),
-                onPressed: onReadPressed,
-              ),
-              IconButton(
-                icon: Icon(Icons.file_upload,
-                    color: Theme.of(context).iconTheme.color?.withOpacity(0.5)),
-                onPressed: onWritePressed,
+
+        if (value!.length != 0) {
+          final value1 = "0x" + value[0].toString();
+          final value2 = "0x" + value[1].toString();
+          final value1_decimal = int.parse(
+            value1,
+          ).toString();
+          final value2_decimal = int.parse(
+            value2,
+          ).toString();
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Value 1 :   ",
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        value1_decimal,
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Value 2 :   ",
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        value2_decimal,
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               IconButton(
                 icon: Icon(
@@ -211,11 +247,30 @@ class CharacteristicTile extends StatelessWidget {
                         : Icons.sync,
                     color: Theme.of(context).iconTheme.color?.withOpacity(0.5)),
                 onPressed: onNotificationPressed,
-              )
+              ),
             ],
-          ),
-          children: descriptorTiles,
-        );
+          );
+        } else {
+          return Row(
+            children: [
+              Text(
+                "Data is loading",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                    characteristic.isNotifying
+                        ? Icons.sync_disabled
+                        : Icons.sync,
+                    color: Theme.of(context).iconTheme.color?.withOpacity(0.5)),
+                onPressed: onNotificationPressed,
+              ),
+            ],
+          );
+        }
       },
     );
   }

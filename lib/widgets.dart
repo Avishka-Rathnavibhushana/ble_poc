@@ -4,6 +4,8 @@
 
 // ignore_for_file: prefer_is_empty, prefer_interpolation_to_compose_strings, non_constant_identifier_names
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
@@ -184,14 +186,10 @@ class CharacteristicTile extends StatelessWidget {
         final value = snapshot.data;
 
         if (value!.length != 0) {
-          final value1 = "0x" + value[0].toString();
-          final value2 = "0x" + value[1].toString();
-          final value1_decimal = int.parse(
-            value1,
-          ).toString();
-          final value2_decimal = int.parse(
-            value2,
-          ).toString();
+          
+          final value1 = value[0].toString();
+          final value2 = value[1].toString();
+          
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -208,7 +206,7 @@ class CharacteristicTile extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        value1_decimal,
+                        value1,
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w300,
@@ -230,7 +228,7 @@ class CharacteristicTile extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        value2_decimal,
+                        value2,
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w300,

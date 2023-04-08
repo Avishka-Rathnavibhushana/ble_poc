@@ -1,95 +1,95 @@
-import 'dart:async';
-import 'dart:io';
+// import 'dart:async';
+// import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:location_permissions/location_permissions.dart';
-
-// import 'dart:io' show Platform;
-
+// import 'package:flutter/material.dart';
+// import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 // import 'package:location_permissions/location_permissions.dart';
 
-// <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
-//                      tools:remove="android:usesPermissionFlags"
-//                      tools:targetApi="s" />
-//     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-//     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
-//     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+// // import 'dart:io' show Platform;
 
-class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+// // import 'package:location_permissions/location_permissions.dart';
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+// // <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+// //                      tools:remove="android:usesPermissionFlags"
+// //                      tools:targetApi="s" />
+// //     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+// //     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+// //     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-class _HomePageState extends State<HomePage> {
-  final _flutterReactiveBle = FlutterReactiveBle();
+// class HomePage extends StatefulWidget {
+//   HomePage({Key? key}) : super(key: key);
 
-  late Stream<DiscoveredDevice> _deviceStream;
-  late StreamSubscription<DiscoveredDevice>? _scanSubscription;
+//   @override
+//   State<HomePage> createState() => _HomePageState();
+// }
 
-  Future<void> startScan() async {
-    bool permGranted = true;
+// class _HomePageState extends State<HomePage> {
+//   final _flutterReactiveBle = FlutterReactiveBle();
 
-    PermissionStatus permission;
-    if (Platform.isAndroid) {
-      permission = await LocationPermissions().requestPermissions();
-      if (permission == PermissionStatus.granted) permGranted = true;
-    } else if (Platform.isIOS) {
-      permGranted = true;
-    }
+//   late Stream<DiscoveredDevice> _deviceStream;
+//   late StreamSubscription<DiscoveredDevice>? _scanSubscription;
 
-    if (permGranted) {
-      _deviceStream = _flutterReactiveBle.scanForDevices(
-        withServices: [],
-        scanMode: ScanMode.lowLatency,
-      ).where((event) => event.name != null && event.name.isNotEmpty);
+//   Future<void> startScan() async {
+//     bool permGranted = true;
 
-      _scanSubscription = _deviceStream.listen((device) {
-        print('Discovered device: ${device.name} (${device.id})');
-      });
-    }
-  }
+//     PermissionStatus permission;
+//     if (Platform.isAndroid) {
+//       permission = await LocationPermissions().requestPermissions();
+//       if (permission == PermissionStatus.granted) permGranted = true;
+//     } else if (Platform.isIOS) {
+//       permGranted = true;
+//     }
 
-  void stopScan() {
-    if (_scanSubscription != null) {
-      _scanSubscription!.cancel();
-      _scanSubscription = null;
-    }
-  }
+//     if (permGranted) {
+//       _deviceStream = _flutterReactiveBle.scanForDevices(
+//         withServices: [],
+//         scanMode: ScanMode.lowLatency,
+//       ).where((event) => event.name != null && event.name.isNotEmpty);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Home Page",
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                await startScan();
-              },
-              child: const Text(
-                "Start",
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                stopScan();
-              },
-              child: const Text(
-                "Stop",
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//       _scanSubscription = _deviceStream.listen((device) {
+//         print('Discovered device: ${device.name} (${device.id})');
+//       });
+//     }
+//   }
+
+//   void stopScan() {
+//     if (_scanSubscription != null) {
+//       _scanSubscription!.cancel();
+//       _scanSubscription = null;
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text(
+//           "Home Page",
+//         ),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             ElevatedButton(
+//               onPressed: () async {
+//                 await startScan();
+//               },
+//               child: const Text(
+//                 "Start",
+//               ),
+//             ),
+//             ElevatedButton(
+//               onPressed: () {
+//                 stopScan();
+//               },
+//               child: const Text(
+//                 "Stop",
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
